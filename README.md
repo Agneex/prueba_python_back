@@ -4,19 +4,19 @@ En esta prueba, se debe crear una aplicación web utilizando FastAPI que consuma
 
 ## Objetivo de la prueba
 
-El objetivo de esta prueba es evaluar tus habilidades en el desarrollo de aplicaciones backend con Python y FastAPI; se espera que crees diferentes endpoints que consuman datos de la API de JSONPlaceholder, se comuniquen entre sí y manejen adecuadamente la información adicional y los registros (logs).
+El objetivo de esta prueba es evaluar las habilidades en el desarrollo de aplicaciones backend con Python y FastAPI; se espera que el candidato desarrolle diferentes endpoints que consuman datos de la API de JSONPlaceholder, se comuniquen entre sí y manejen adecuadamente la información adicional y los registros (logs).
 
 ## Metodología a utilizar
 
-Debes utilizar FastAPI como framework para crear tu aplicación web; además, se recomienda seguir las buenas prácticas de desarrollo, como la utilización de versiones controladas de Python (por ejemplo, utilizando Pyenv o pyenv-virtualenv), el uso de un gestor de dependencias (por ejemplo, pipenv o poetry) y la escritura de tests unitarios para tus endpoints.
+Se debe utilizar FastAPI como framework para crear la aplicación web; además, se recomienda seguir las buenas prácticas de desarrollo, como la utilización de versiones controladas de Python (por ejemplo, utilizando Pyenv o pyenv-virtualenv), el uso de un gestor de dependencias (por ejemplo, pipenv o poetry) y la escritura de tests unitarios para tus endpoints.
 
 ## Entregables
 
 Los entregables de esta prueba son:
 
-1. Un fork de este repositorio contenga el código fuente.
+1. Un fork de este repositorio que contenga el código fuente.
 2. Un archivo README.md dentro del repositorio con una breve descripción del proyecto, cómo ejecutar la aplicación y cualquier otra información relevante.
-3. Para la entrega se debe realizar una presentación de no mas de 30 minutos de presentación y 15 minutos de preguntas donde se explique el uso de la aplicación y también una breve exposición de la educación y experiencia del candidato.
+3. Para la entrega se debe realizar una presentación de no mas de 30 minutos 15 minutos de preguntas donde se explique el uso de la aplicación y también una breve exposición de la educación y experiencia del candidato.
 
 ## Endpoints a implementar
 
