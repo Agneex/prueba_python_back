@@ -27,14 +27,14 @@ Los entregables de esta prueba son:
 
 1. Un **fork de este repositorio** con el código fuente del proyecto.
 2. Un archivo README.md con:
-  * Una breve descripción del proyecto.
-  * Instrucciones detalladas para ejecutar la aplicación (instalación de dependencias, levantar servidor, etc.).
-  * Ejemplos de uso de los endpoints (pueden incluir curl, Postman o Swagger UI).
-  * Opcional: instrucciones para correr tests.
+2.1 Una breve descripción del proyecto.
+2.2 Instrucciones detalladas para ejecutar la aplicación (instalación de dependencias, levantar servidor, etc.).
+2.3 Ejemplos de uso de los endpoints (pueden incluir curl, Postman o Swagger UI).
+2.4 Opcional: instrucciones para correr tests.
 3. Una presentación de máximo 30 minutos , incluyendo:
-  * Demostración funcional de la aplicación.
-  * Explicación de tu enfoque técnico y decisiones de diseño.
-  * Breve exposición sobre tu formación y experiencia profesional (máximo 15 minutos).
+3.1 Demostración funcional de la aplicación.
+3.2 Explicación de tu enfoque técnico y decisiones de diseño.
+3.3 Breve exposición sobre tu formación y experiencia profesional (máximo 15 minutos).
 
 ## Endpoints a implementar
 
