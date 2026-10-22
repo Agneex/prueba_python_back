@@ -11,7 +11,8 @@ class Settings(BaseSettings):
     log_level: str = "INFO"
     log_json: bool = True
 
-    database_url: str = "sqlite+aiosqlite:///./app.db"
+    database_url: str
+    test_database_url: str | None = None
     database_echo: bool = False
 
 

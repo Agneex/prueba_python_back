@@ -21,9 +21,19 @@ Evaluar tu capacidad para:
 
 - Python 3.12 gestionado con [`uv`](https://docs.astral.sh/uv/).
 - FastAPI + Pydantic v2.
-- SQLite (asíncrono) como base de datos. No se requiere Docker.
+- **PostgreSQL 16 como base de datos (requisito obligatorio)**, con acceso asíncrono mediante SQLAlchemy 2 y `asyncpg`. Se incluye `docker/compose.yml` para levantarla en local.
 - Toda configuración se lee de variables de entorno (ver `.env.example`). No se aceptan valores sensibles en el código.
-- Tests con `pytest`.
+- Tests con `pytest` contra una base PostgreSQL de pruebas, separada de la de desarrollo. No se aceptan tests de integración sobre SQLite.
+
+### Puesta en marcha
+
+```bash
+cp .env.example .env            # completa los valores
+docker compose -f docker/compose.yml --env-file .env up -d --wait
+uv sync
+uv run pytest
+uv run uvicorn app.main:app --reload
+```
 
 ## Conceptos
 

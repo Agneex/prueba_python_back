@@ -3,14 +3,23 @@ from collections.abc import AsyncIterator
 import pytest
 from httpx import ASGITransport, AsyncClient
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
+from sqlalchemy.pool import NullPool
 
+from app.core.config import get_settings
+from app.db.base import Base
 from app.db.session import get_session, init_db
 from app.main import app
 
 
 @pytest.fixture
-async def session_factory(tmp_path) -> AsyncIterator[async_sessionmaker[AsyncSession]]:
-    test_engine = create_async_engine(f"sqlite+aiosqlite:///{tmp_path / 'test.db'}")
+async def session_factory() -> AsyncIterator[async_sessionmaker[AsyncSession]]:
+    test_database_url = get_settings().test_database_url
+    if not test_database_url:
+        pytest.exit("Define APP_TEST_DATABASE_URL para ejecutar los tests", returncode=2)
+
+    test_engine = create_async_engine(test_database_url, poolclass=NullPool)
+    async with test_engine.begin() as connection:
+        await connection.run_sync(Base.metadata.drop_all)
     await init_db(test_engine)
     yield async_sessionmaker(test_engine, expire_on_commit=False)
     await test_engine.dispose()
