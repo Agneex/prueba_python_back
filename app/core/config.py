@@ -11,6 +11,9 @@ class Settings(BaseSettings):
     log_level: str = "INFO"
     log_json: bool = True
 
+    database_url: str = "sqlite+aiosqlite:///./app.db"
+    database_echo: bool = False
+
 
 @lru_cache
 def get_settings() -> Settings:

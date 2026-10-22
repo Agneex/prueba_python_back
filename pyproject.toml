@@ -5,8 +5,10 @@ description = "API para registrar funciones implícitas, calcular volúmenes y v
 readme = "README.md"
 requires-python = ">=3.12,<3.13"
 dependencies = [
+    "aiosqlite>=0.22.1",
     "fastapi>=0.161.1",
     "pydantic-settings>=2.16.1",
+    "sqlalchemy[asyncio]>=2.1.6",
     "structlog>=26.1.0",
     "uvicorn[standard]>=0.54.0",
 ]

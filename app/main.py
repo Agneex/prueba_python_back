@@ -6,6 +6,7 @@ from fastapi import FastAPI
 from app.core.config import get_settings
 from app.core.logging import configure_logging, get_logger
 from app.core.middleware import RequestLoggingMiddleware
+from app.db.session import engine, init_db
 
 settings = get_settings()
 configure_logging(settings.log_level, settings.log_json)
@@ -14,8 +15,10 @@ logger = get_logger(__name__)
 
 @asynccontextmanager
 async def lifespan(_: FastAPI) -> AsyncIterator[None]:
+    await init_db()
     logger.info("app_started", environment=settings.environment)
     yield
+    await engine.dispose()
     logger.info("app_stopped")
 
 
