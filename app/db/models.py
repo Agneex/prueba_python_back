@@ -1,4 +1,5 @@
-from sqlalchemy import JSON, ForeignKey, Integer, String, Text
+from sqlalchemy import ForeignKey, Integer, String, Text
+from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.db.base import Base, TimestampMixin
@@ -26,7 +27,7 @@ class ImplicitFunction(TimestampMixin, Base):
     owner_id: Mapped[int] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"), index=True)
     name: Mapped[str] = mapped_column(String(120))
     expression: Mapped[str] = mapped_column(Text)
-    domain: Mapped[list[list[float]]] = mapped_column(JSON)
+    domain: Mapped[list[list[float]]] = mapped_column(JSONB)
     resolution: Mapped[int] = mapped_column(Integer, default=64)
     version: Mapped[int] = mapped_column(Integer, default=1)
 
