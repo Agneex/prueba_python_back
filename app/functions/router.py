@@ -3,7 +3,8 @@ from fastapi import APIRouter, status
 from app.core.logging import get_logger
 from app.functions import service
 from app.functions.dependencies import OwnedFunction
-from app.functions.schemas import FunctionCreate, FunctionRead, FunctionUpdate
+from app.functions.parser import evaluate_point
+from app.functions.schemas import FunctionCreate, FunctionRead, FunctionUpdate, PointEvaluation
 from app.users.dependencies import CurrentUser, SessionDep
 
 router = APIRouter(prefix="/functions", tags=["functions"])
@@ -33,3 +34,9 @@ async def update_function(function: OwnedFunction, data: FunctionUpdate, session
     updated = await service.update_function(session, function, data)
     logger.info("function_updated", function_id=updated.id, version=updated.version)
     return FunctionRead.model_validate(updated)
+
+
+@router.get("/{function_id}/evaluate")
+async def evaluate_function(function: OwnedFunction, x: float, y: float, z: float) -> PointEvaluation:
+    value = evaluate_point(function.expression, x, y, z)
+    return PointEvaluation(x=x, y=y, z=z, value=value, is_inside=value <= 0)

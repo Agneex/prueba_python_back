@@ -65,3 +65,18 @@ async def test_create_rejects_unknown_names(client):
     response = await client.post("/functions", json=payload, headers=headers)
 
     assert response.status_code == 422
+
+
+async def test_evaluate_point_inside_and_on_surface(client):
+    _, headers = await register_and_login(client, "ana")
+    created = (await client.post("/functions", json=SPHERE, headers=headers)).json()
+    url = f"/functions/{created['id']}/evaluate"
+
+    center = (await client.get(url, params={"x": 0, "y": 0, "z": 0}, headers=headers)).json()
+    surface = (await client.get(url, params={"x": 1, "y": 0, "z": 0}, headers=headers)).json()
+    outside = (await client.get(url, params={"x": 1, "y": 1, "z": 1}, headers=headers)).json()
+
+    assert center["value"] == -1.0
+    assert center["is_inside"] is True
+    assert surface["value"] == 0.0
+    assert outside["is_inside"] is False

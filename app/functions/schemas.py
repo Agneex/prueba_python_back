@@ -84,3 +84,11 @@ class FunctionRead(BaseModel):
     version: int
     created_at: datetime
     updated_at: datetime
+
+
+class PointEvaluation(BaseModel):
+    x: float
+    y: float
+    z: float
+    value: float
+    is_inside: bool

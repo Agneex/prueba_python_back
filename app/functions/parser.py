@@ -56,3 +56,8 @@ def check_expression(expression: str) -> None:
         raise ExpressionError(f"Nombre no permitido: {error.name}") from error
     except Exception as error:
         raise ExpressionError(f"No se pudo evaluar la expresión: {error}") from error
+
+
+def evaluate_point(expression: str, x: float, y: float, z: float) -> float:
+    evaluate = compile_expression(expression)
+    return float(evaluate(x, y, z))
