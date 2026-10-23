@@ -14,7 +14,7 @@ logger = get_logger(__name__)
 
 
 @router.get("/{function_id}/volume")
-def get_volume(function: OwnedFunction) -> VolumeResult:
+async def get_volume(function: OwnedFunction) -> VolumeResult:
     estimate = estimate_volume(function.expression, function.domain, function.resolution)
     logger.info(
         "volume_computed",
@@ -33,7 +33,7 @@ def get_volume(function: OwnedFunction) -> VolumeResult:
 
 
 @router.get("/{function_id}/mesh.bin", response_class=Response)
-def get_mesh(function: OwnedFunction) -> Response:
+async def get_mesh(function: OwnedFunction) -> Response:
     grid = sample_function(function.expression, function.domain, function.resolution)
     mesh = extract_mesh(grid)
     logger.info("mesh_generated", function_id=function.id, faces=len(mesh.faces))
