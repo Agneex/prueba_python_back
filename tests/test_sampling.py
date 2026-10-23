@@ -1,0 +1,24 @@
+from app.volumes.sampling import sample_function
+
+CUBE = [[-1.5, 1.5], [-1.5, 1.5], [-1.5, 1.5]]
+
+
+def test_sample_has_requested_resolution():
+    grid = sample_function("x**2 + y**2 + z**2 - 1", CUBE, 32)
+
+    assert grid.shape == (32, 32, 32)
+    assert grid.origin == (-1.5, -1.5, -1.5)
+
+
+def test_sample_center_of_sphere_is_inside():
+    grid = sample_function("x**2 + y**2 + z**2 - 1", CUBE, 32)
+
+    assert grid.values.min() < -0.99
+    assert grid.values[15, 15, 15] < 0
+
+
+def test_sample_corners_are_outside():
+    grid = sample_function("x**2 + y**2 + z**2 - 1", CUBE, 16)
+
+    assert grid.values[0, 0, 0] > 0
+    assert grid.values[-1, -1, -1] > 0
