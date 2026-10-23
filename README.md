@@ -76,13 +76,28 @@ Cualquier otra construcción debe ser rechazada.
 |---|---|
 | `POST /auth/register` | Registro de usuario |
 | `POST /auth/token` | Login; devuelve un JWT |
-| `GET /users/{id}` | Información del usuario. Incluye `generated_at` con la fecha y hora actual en formato `YYYY-MM-DD HH:MM:SS` |
+| `GET /users/{id}` | Información del usuario. Incluye `generated_at` con la fecha y hora actual (UTC) en formato `YYYY-MM-DD HH:MM:SS` |
 | `POST /functions` · `GET /functions` | Crear y listar **las funciones del usuario autenticado** |
 | `GET /functions/{id}` · `PATCH /functions/{id}` | Consultar y editar una función propia |
 | `GET /functions/{id}/evaluate?x=&y=&z=` | Valor de `f` en un punto |
 | `GET /functions/{id}/volume` | Volumen de la región `f ≤ 0` dentro del dominio |
 | `GET /functions/{id}/mesh.bin` | Malla triangular de la superficie `f = 0` en formato binario |
 | `GET /viewer?fn={id}` | Visor 3D de la función |
+
+### Formato de respuesta de `GET /functions/{id}/volume`
+
+Objeto JSON con estos campos:
+
+| Campo | Descripción |
+|---|---|
+| `function_id` | Id de la función |
+| `resolution` | Resolución usada en el cálculo |
+| `mesh_volume` | Volumen calculado a partir de la malla de la superficie `f = 0`. Es el **valor de referencia** de la prueba |
+| `voxel_volume` | Volumen estimado contando los puntos de la rejilla con `f ≤ 0` |
+| `domain_volume` | Volumen de la caja del dominio |
+| `generated_at` | Fecha y hora actual (UTC), formato `YYYY-MM-DD HH:MM:SS` |
+
+Puedes añadir campos, pero estos deben mantenerse.
 
 ## Requisitos generales
 
