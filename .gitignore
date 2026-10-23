@@ -50,3 +50,16 @@ coverage.xml
 .idea/
 .DS_Store
 Thumbs.db
+
+# Front (artefactos de compilación y dependencias)
+node_modules/
+.vite/
+.next/
+.nuxt/
+.svelte-kit/
+.parcel-cache/
+.angular/
+coverage/
+*.tsbuildinfo
+.npm/
+npm-debug.log*
