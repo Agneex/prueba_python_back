@@ -168,7 +168,6 @@ Para poder revisar tu front con independencia de la tecnología:
    - Descripción del proyecto y cómo ejecutarlo y probarlo.
    - La tabla de convergencia de la tarea C.
    - Cómo instalar y arrancar el front, la URL en la que queda y la variable de entorno que configura la URL de la API.
-5. **Sustentación** de 45 minutos:
-   - 10 min de demostración.
-   - 20 min de ejercicio práctico en vivo sobre tu propio código.
-   - 15 min de preguntas sobre tu historial de commits.
+5. **Sustentación** de 45 minutos, sin asistentes de IA:
+   - 20 min de demostración: levantar el proyecto y el front siguiendo tu README y mostrar los resultados.
+   - 25 min de preguntas sobre tu código, tus decisiones y tu historial de commits.
