@@ -1,0 +1,9 @@
+# Normaliza los finales de línea a LF en el repositorio y en la copia de trabajo.
+* text=auto eol=lf
+
+*.sh text eol=lf
+*.png binary
+*.ico binary
+
+# Archivo generado por uv: se marca para que las herramientas de revisión lo traten como tal.
+uv.lock linguist-generated=true
