@@ -4,6 +4,7 @@ from typing import Annotated
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 
 from app.core.config import get_settings
+from app.functions.parser import ExpressionError, check_expression
 
 Interval = Annotated[list[float], Field(min_length=2, max_length=2)]
 Domain = Annotated[list[Interval], Field(min_length=3, max_length=3)]
@@ -31,6 +32,10 @@ def validate_expression(expression: str) -> str:
         raise ValueError("La expresión no puede estar vacía")
     if len(expression) > get_settings().max_expression_length:
         raise ValueError("La expresión es demasiado larga")
+    try:
+        check_expression(expression)
+    except ExpressionError as error:
+        raise ValueError(str(error)) from error
     return expression
 
 

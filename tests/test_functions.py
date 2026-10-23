@@ -56,3 +56,12 @@ async def test_update_increments_version(client):
 
     assert response.status_code == 200
     assert response.json()["version"] == 2
+
+
+async def test_create_rejects_unknown_names(client):
+    _, headers = await register_and_login(client, "ana")
+    payload = {**SPHERE, "expression": "__import__('os').getcwd()"}
+
+    response = await client.post("/functions", json=payload, headers=headers)
+
+    assert response.status_code == 422
