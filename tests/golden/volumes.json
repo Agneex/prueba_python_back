@@ -1,0 +1,17 @@
+{
+  "esfera": {
+    "resolution": 64,
+    "voxel_volume": 4.019348,
+    "mesh_volume": 3.988701
+  },
+  "toro": {
+    "resolution": 64,
+    "voxel_volume": 1.16922,
+    "mesh_volume": 1.163028
+  },
+  "gyroide": {
+    "resolution": 64,
+    "voxel_volume": 124.028892,
+    "mesh_volume": 122.873968
+  }
+}
