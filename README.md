@@ -106,6 +106,7 @@ Puedes añadir campos, pero estos deben mantenerse.
 3. La API nunca debe responder `500` ante una expresión válida.
 4. El servicio debe seguir respondiendo a otras peticiones mientras calcula volúmenes o mallas.
 5. Los límites de recursos (por ejemplo, la resolución máxima) deben ser configurables por variables de entorno.
+6. Si el front se sirve desde un origen distinto al de la API, los orígenes permitidos (CORS) deben configurarse por variable de entorno.
 
 ## Tareas
 
@@ -124,6 +125,40 @@ La superficie debe verse correctamente en `/viewer` para todos los ejemplos, inc
 ### E. Robustez y recursos
 Cumple los requisitos generales 3, 4 y 5.
 
+### F. Panel de resultados (front)
+Construye una interfaz web que muestre los resultados que genera tu API. **Puedes usar la tecnología que prefieras** (HTML y JavaScript, React, Vue, Svelte, etc.) y reutilizar o reemplazar el visor de `/viewer`.
+
+El panel debe permitir:
+
+1. Iniciar sesión con usuario y contraseña (`POST /auth/token`).
+2. Ver la lista de funciones del usuario autenticado.
+3. Seleccionar una función y ver su `mesh_volume`, su `voxel_volume`, su `domain_volume` y la **diferencia relativa** entre los dos primeros, expresada en porcentaje: `100 · |mesh_volume − voxel_volume| / |mesh_volume|`.
+4. Ver la superficie en 3D.
+5. Ver la **tabla de convergencia** de la función seleccionada para n = 32, 64, 128 y 256, con el volumen por malla y por vóxeles de cada fila.
+6. Mostrar mensajes de error comprensibles cuando la API responda `401`, `404`, `422` o `503`, o cuando un valor no sea un número finito.
+
+#### Contrato mínimo
+
+Para poder revisar tu front con independencia de la tecnología:
+
+- Tu `README.md` indica los comandos para instalarlo y arrancarlo, la URL en la que queda disponible y la variable de entorno que configura la URL de la API.
+- Estos elementos llevan el atributo `data-testid` indicado:
+
+| `data-testid` | Elemento |
+|---|---|
+| `login-username`, `login-password`, `login-submit` | Campos y botón del formulario de acceso |
+| `function-list` | Contenedor de la lista de funciones |
+| `function-item` | Cada función de la lista; su texto incluye el nombre |
+| `volume-mesh`, `volume-voxel`, `volume-domain` | Volúmenes de la función seleccionada |
+| `volume-difference` | Diferencia relativa, en porcentaje |
+| `surface-view` | Contenedor de la vista 3D |
+| `convergence-table` | Tabla de convergencia |
+| `convergence-row` | Cada fila de la tabla; lleva además el atributo `data-n` con el valor de n |
+| `convergence-mesh`, `convergence-voxel` | Celdas de la fila con el volumen por malla y por vóxeles |
+| `error-message` | Mensaje de error visible |
+
+- El texto de los valores numéricos incluye el número con al menos 4 cifras significativas.
+
 ## Entregables
 
 1. Un **fork** de este repositorio con tu solución.
@@ -132,6 +167,7 @@ Cumple los requisitos generales 3, 4 y 5.
 4. Un `README.md` con:
    - Descripción del proyecto y cómo ejecutarlo y probarlo.
    - La tabla de convergencia de la tarea C.
+   - Cómo instalar y arrancar el front, la URL en la que queda y la variable de entorno que configura la URL de la API.
 5. **Sustentación** de 45 minutos:
    - 10 min de demostración.
    - 20 min de ejercicio práctico en vivo sobre tu propio código.
