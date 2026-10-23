@@ -35,3 +35,7 @@ async def authenticate_user(session: AsyncSession, username: str, password: str)
     if not verify_password(password, user.hashed_password):
         return None
     return user
+
+
+async def get_user(session: AsyncSession, user_id: int) -> User | None:
+    return await session.get(User, user_id)
