@@ -1,0 +1,198 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Visor de volúmenes</title>
+  <style>
+    :root { --bg: #11151c; --panel: #1b212b; --text: #e6e9ef; --muted: #8b95a5; --accent: #4f9cf9; --error: #f2706b; }
+    * { box-sizing: border-box; }
+    body { margin: 0; height: 100vh; display: flex; font: 14px/1.4 system-ui, sans-serif; background: var(--bg); color: var(--text); }
+    aside { width: 300px; padding: 16px; background: var(--panel); display: flex; flex-direction: column; gap: 12px; overflow-y: auto; }
+    main { flex: 1; position: relative; }
+    canvas { display: block; }
+    h1 { font-size: 16px; margin: 0; }
+    label { display: flex; flex-direction: column; gap: 4px; color: var(--muted); }
+    input, select, button { font: inherit; padding: 6px 8px; border-radius: 6px; border: 1px solid #2c3442; background: var(--bg); color: var(--text); }
+    button { background: var(--accent); border: none; color: #fff; cursor: pointer; }
+    dl { display: grid; grid-template-columns: auto 1fr; gap: 4px 8px; margin: 0; }
+    dt { color: var(--muted); }
+    dd { margin: 0; font-family: ui-monospace, monospace; word-break: break-all; }
+    .error { color: var(--error); min-height: 1.4em; }
+    .hidden { display: none; }
+    @media (max-width: 720px) { body { flex-direction: column; } aside { width: 100%; max-height: 45vh; } }
+  </style>
+  <script type="importmap">
+    { "imports": {
+        "three": "https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js",
+        "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/"
+    } }
+  </script>
+</head>
+<body>
+  <aside>
+    <h1>Visor de volúmenes</h1>
+    <form id="login">
+      <label>Usuario <input name="username" autocomplete="username" required></label>
+      <label>Contraseña <input name="password" type="password" autocomplete="current-password" required></label>
+      <button type="submit">Entrar</button>
+    </form>
+    <div id="session" class="hidden">
+      <label>Función <select id="functions"></select></label>
+      <button id="logout" type="button">Salir</button>
+    </div>
+    <dl id="info"></dl>
+    <p id="error" class="error"></p>
+  </aside>
+  <main id="stage"></main>
+
+  <script type="module">
+    import * as THREE from "three";
+    import { OrbitControls } from "three/addons/controls/OrbitControls.js";
+
+    const TOKEN_KEY = "viewer-token";
+    const $ = (selector) => document.querySelector(selector);
+
+    const getToken = () => { try { return sessionStorage.getItem(TOKEN_KEY); } catch { return null; } };
+    const setToken = (token) => { try { token ? sessionStorage.setItem(TOKEN_KEY, token) : sessionStorage.removeItem(TOKEN_KEY); } catch {} };
+
+    async function api(path, asBinary = false) {
+      const response = await fetch(path, { headers: { Authorization: `Bearer ${getToken()}` } });
+      if (response.status === 401) { setToken(null); showLogin(); throw new Error("Sesión expirada"); }
+      if (!response.ok) throw new Error(`Error ${response.status} en ${path}`);
+      return asBinary ? response.arrayBuffer() : response.json();
+    }
+
+    // Formato IMSH: ver app/volumes/binary.py
+    function decodeMesh(buffer) {
+      const view = new DataView(buffer);
+      const magic = String.fromCharCode(...new Uint8Array(buffer, 0, 4));
+      if (magic !== "IMSH") throw new Error("Formato de malla desconocido");
+      const vertexCount = view.getUint32(8, true);
+      const faceCount = view.getUint32(12, true);
+      const origin = [view.getFloat32(16, true), view.getFloat32(20, true), view.getFloat32(24, true)];
+      const headerSize = 28;
+      const vertices = new Float32Array(buffer, headerSize, vertexCount * 3);
+      const faces = new Uint16Array(buffer, headerSize + vertices.byteLength, faceCount * 3);
+      return { origin, vertices, faces };
+    }
+
+    const renderer = new THREE.WebGLRenderer({ antialias: true });
+    renderer.setPixelRatio(window.devicePixelRatio);
+    $("#stage").appendChild(renderer.domElement);
+
+    const scene = new THREE.Scene();
+    scene.background = new THREE.Color(0x11151c);
+    scene.add(new THREE.HemisphereLight(0xffffff, 0x334455, 1.2));
+    const sun = new THREE.DirectionalLight(0xffffff, 1.5);
+    sun.position.set(3, 5, 4);
+    scene.add(sun);
+
+    const camera = new THREE.PerspectiveCamera(45, 1, 0.01, 1000);
+    const controls = new OrbitControls(camera, renderer.domElement);
+    const axes = new THREE.AxesHelper(1);
+    scene.add(axes);
+    let current = null;
+
+    function resize() {
+      const { clientWidth: width, clientHeight: height } = $("#stage");
+      renderer.setSize(width, height);
+      camera.aspect = width / height;
+      camera.updateProjectionMatrix();
+    }
+    window.addEventListener("resize", resize);
+    resize();
+    renderer.setAnimationLoop(() => { controls.update(); renderer.render(scene, camera); });
+
+    function showMesh({ vertices, faces }) {
+      if (current) { scene.remove(current); current.geometry.dispose(); }
+      const geometry = new THREE.BufferGeometry();
+      geometry.setAttribute("position", new THREE.BufferAttribute(vertices, 3));
+      geometry.setIndex(new THREE.BufferAttribute(faces, 1));
+      geometry.computeVertexNormals();
+      geometry.computeBoundingSphere();
+
+      const material = new THREE.MeshStandardMaterial({ color: 0x4f9cf9, roughness: 0.45, metalness: 0.1 });
+      current = new THREE.Mesh(geometry, material);
+      scene.add(current);
+
+      const { center, radius } = geometry.boundingSphere;
+      axes.position.copy(center);
+      axes.scale.setScalar(radius * 0.6);
+      controls.target.copy(center);
+      camera.position.copy(center).add(new THREE.Vector3(radius * 1.8, radius * 1.4, radius * 2.2));
+      camera.near = radius / 100;
+      camera.far = radius * 100;
+      camera.updateProjectionMatrix();
+    }
+
+    function showInfo(rows) {
+      $("#info").innerHTML = "";
+      for (const [label, value] of rows) {
+        const dt = document.createElement("dt");
+        const dd = document.createElement("dd");
+        dt.textContent = label;
+        dd.textContent = value;
+        $("#info").append(dt, dd);
+      }
+    }
+
+    async function loadFunction(id) {
+      $("#error").textContent = "";
+      try {
+        const [fn, buffer, volume] = await Promise.all([
+          api(`/functions/${id}`),
+          api(`/functions/${id}/mesh.bin`, true),
+          api(`/functions/${id}/volume`),
+        ]);
+        const mesh = decodeMesh(buffer);
+        showMesh(mesh);
+        showInfo([
+          ["Expresión", fn.expression],
+          ["Resolución", fn.resolution],
+          ["Vértices", mesh.vertices.length / 3],
+          ["Triángulos", mesh.faces.length / 3],
+          ["Origen", mesh.origin.map((value) => value.toFixed(3)).join(", ")],
+          ["Vol. malla", volume.mesh_volume.toFixed(6)],
+          ["Vol. vóxel", volume.voxel_volume.toFixed(6)],
+        ]);
+        const url = new URL(window.location);
+        url.searchParams.set("fn", id);
+        history.replaceState(null, "", url);
+      } catch (error) {
+        $("#error").textContent = error.message;
+      }
+    }
+
+    async function showSession() {
+      $("#login").classList.add("hidden");
+      $("#session").classList.remove("hidden");
+      const functions = await api("/functions");
+      const select = $("#functions");
+      select.innerHTML = "";
+      for (const fn of functions) select.add(new Option(`${fn.id} · ${fn.name}`, fn.id));
+      const requested = new URLSearchParams(window.location.search).get("fn");
+      if (requested) select.value = requested;
+      if (select.value) loadFunction(select.value);
+    }
+
+    function showLogin() {
+      $("#login").classList.remove("hidden");
+      $("#session").classList.add("hidden");
+    }
+
+    $("#login").addEventListener("submit", async (event) => {
+      event.preventDefault();
+      $("#error").textContent = "";
+      const response = await fetch("/auth/token", { method: "POST", body: new URLSearchParams(new FormData(event.target)) });
+      if (!response.ok) { $("#error").textContent = "Usuario o contraseña incorrectos"; return; }
+      setToken((await response.json()).access_token);
+      showSession().catch((error) => { $("#error").textContent = error.message; });
+    });
+    $("#functions").addEventListener("change", (event) => loadFunction(event.target.value));
+    $("#logout").addEventListener("click", () => { setToken(null); showLogin(); });
+
+    if (getToken()) showSession().catch(showLogin); else showLogin();
+  </script>
+</body>
+</html>

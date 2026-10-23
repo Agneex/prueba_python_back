@@ -1,7 +1,10 @@
 from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
+from pathlib import Path
 
 from fastapi import FastAPI
+from fastapi.responses import FileResponse
+from fastapi.staticfiles import StaticFiles
 
 from app.core.config import get_settings
 from app.core.logging import configure_logging, get_logger
@@ -12,6 +15,8 @@ from app.functions.router import router as functions_router
 from app.users.auth_router import router as auth_router
 from app.users.router import router as users_router
 from app.volumes.router import router as volumes_router
+
+STATIC_DIR = Path(__file__).parent / "static"
 
 settings = get_settings()
 configure_logging(settings.log_level, settings.log_json)
@@ -34,8 +39,14 @@ app.include_router(users_router)
 app.include_router(examples_router)
 app.include_router(functions_router)
 app.include_router(volumes_router)
+app.mount("/static", StaticFiles(directory=STATIC_DIR), name="static")
 
 
 @app.get("/health", tags=["health"])
 async def health() -> dict[str, str]:
     return {"status": "ok"}
+
+
+@app.get("/viewer", include_in_schema=False)
+async def viewer() -> FileResponse:
+    return FileResponse(STATIC_DIR / "viewer" / "index.html")
