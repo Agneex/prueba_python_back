@@ -80,3 +80,12 @@ async def test_evaluate_point_inside_and_on_surface(client):
     assert center["is_inside"] is True
     assert surface["value"] == 0.0
     assert outside["is_inside"] is False
+
+
+async def test_create_accepts_high_resolution(client):
+    _, headers = await register_and_login(client, "ana")
+
+    response = await client.post("/functions", json={**SPHERE, "resolution": 1024}, headers=headers)
+
+    assert response.status_code == 201
+    assert response.json()["resolution"] == 1024

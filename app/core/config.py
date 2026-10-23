@@ -21,7 +21,7 @@ class Settings(BaseSettings):
 
     default_resolution: int = 64
     min_resolution: int = 8
-    max_resolution: int = 256
+    max_resolution: int = 2048
     max_expression_length: int = 500
 
 
