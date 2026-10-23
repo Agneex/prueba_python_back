@@ -19,6 +19,11 @@ class Settings(BaseSettings):
     jwt_algorithm: str = "HS256"
     access_token_expire_minutes: int = 30
 
+    default_resolution: int = 64
+    min_resolution: int = 8
+    max_resolution: int = 2048
+    max_expression_length: int = 500
+
 
 @lru_cache
 def get_settings() -> Settings:
