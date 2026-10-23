@@ -1,0 +1,49 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: ci_user
+          POSTGRES_PASSWORD: ci_password
+          POSTGRES_DB: ci_db
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U ci_user -d ci_db"
+          --health-interval 5s
+          --health-timeout 3s
+          --health-retries 10
+
+    env:
+      APP_DATABASE_URL: postgresql+asyncpg://ci_user:ci_password@localhost:5432/ci_db
+      APP_TEST_DATABASE_URL: postgresql+asyncpg://ci_user:ci_password@localhost:5432/ci_db
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: astral-sh/setup-uv@v6
+        with:
+          enable-cache: true
+
+      - name: Instalar dependencias
+        run: uv sync --frozen
+
+      - name: Generar clave secreta efímera
+        run: echo "APP_SECRET_KEY=$(openssl rand -hex 32)" >> "$GITHUB_ENV"
+
+      - name: Ejecutar pruebas
+        run: uv run pytest -q
