@@ -9,6 +9,13 @@ from app.core.config import get_settings
 from app.db.base import Base
 from app.db.session import get_session, init_db
 from app.main import app
+from app.volumes.cache import mesh_cache, volume_cache
+
+
+@pytest.fixture(autouse=True)
+def clear_caches() -> None:
+    mesh_cache.clear()
+    volume_cache.clear()
 
 
 @pytest.fixture

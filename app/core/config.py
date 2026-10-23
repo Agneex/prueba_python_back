@@ -24,6 +24,8 @@ class Settings(BaseSettings):
     max_resolution: int = 2048
     max_expression_length: int = 500
 
+    cache_max_items: int = 128
+
 
 @lru_cache
 def get_settings() -> Settings:
