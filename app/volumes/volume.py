@@ -24,7 +24,9 @@ def mesh_volume(mesh: TriangleMesh) -> float:
         return 0.0
     v0, v1, v2 = (mesh.vertices[mesh.faces[:, i]] for i in range(3))
     signed = np.einsum("ij,ij->i", v0, np.cross(v1, v2)).sum() / 6.0
-    return float(signed)
+    # La suma de tetraedros acumula error de redondeo y el signo depende de la orientación
+    # numérica de los triángulos; el volumen es una magnitud, se reporta en valor absoluto.
+    return float(abs(signed))
 
 
 def domain_volume(domain: list[list[float]]) -> float:
