@@ -7,6 +7,7 @@ from app.core.config import get_settings
 from app.core.logging import configure_logging, get_logger
 from app.core.middleware import RequestLoggingMiddleware
 from app.db.session import engine, init_db
+from app.functions.examples_router import router as examples_router
 from app.functions.router import router as functions_router
 from app.users.auth_router import router as auth_router
 from app.users.router import router as users_router
@@ -29,6 +30,7 @@ app = FastAPI(title=settings.name, version="0.1.0", lifespan=lifespan)
 app.add_middleware(RequestLoggingMiddleware)
 app.include_router(auth_router)
 app.include_router(users_router)
+app.include_router(examples_router)
 app.include_router(functions_router)
 
 
